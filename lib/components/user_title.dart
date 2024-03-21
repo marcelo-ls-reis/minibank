@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:minibank/models/user.dart';
+import 'package:provider/provider.dart';
 
+import '../provider/users.dart';
 import '../routes/app_routes.dart';
 
 class UserTitle extends StatelessWidget {
@@ -19,23 +21,44 @@ class UserTitle extends StatelessWidget {
       subtitle: Text(user.email),
       trailing: SizedBox(
         width: 100,
-        child: Row(children: <Widget>[
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(
-                AppRoutes.userForm,
-                arguments: user
-              );
-            },
-            icon: const Icon(Icons.edit),
-            color: Colors.orange,
-          ),
-          const IconButton(
-            onPressed: null,
-            icon: Icon(Icons.delete),
-            color: Colors.red,
-          ),
-        ]),
+        child: Row(
+          children: <Widget>[
+            IconButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(AppRoutes.userForm, arguments: user);
+              },
+              icon: const Icon(Icons.edit),
+              color: Colors.orange,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete),
+              color: Colors.red,
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                          title: const Text('Excluir Usuário'),
+                          content: const Text('Tem certeza?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('Não'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: const Text('Sim'),
+                            ),
+                          ],
+                        )).then((confirmed) {
+                  if (confirmed) {
+                    Provider.of<Users>(context, listen: false).remove(user);
+                  }
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
